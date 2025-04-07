@@ -1,4 +1,4 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
   import 'login_page_v2.dart';
   // ignore: unused_import
   import 'sign_up_screen.dart';
@@ -38,7 +38,7 @@
               ),
               const SizedBox(height: 40),
 
-              /// 🔘 زر تسجيل الدخول مع تظليل عند الضغط
+              
               CustomButton(
                 text: "Login",
                 highlight: true,
@@ -52,10 +52,10 @@
 
               const SizedBox(height: 20),
 
-              /// 🔘 زر التسجيل مع نفس التظليل
+              
               CustomButton(
                 text: "Sign up",
-                highlight: true, // ← تم تفعيل التظليل هنا أيضًا
+                highlight: true, 
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -70,7 +70,6 @@
     }
   }
 
-  /// 📌 زر مخصص مع خيار التظليل عند الضغط
   class CustomButton extends StatelessWidget {
     final String text;
     final VoidCallback onPressed;

@@ -10,17 +10,44 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # 📦 إدارة الحالة والتخزين المؤقت
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+
+  # 📦 الوصول إلى المسارات
+  path_provider: ^2.1.2
+
+  # 📦 الإشعارات المحلية
+  flutter_local_notifications: ^19.0.0
+
+  # 🌍 دعم الترجمة
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+
+  # 📷 التقاط الصور
+  image_picker: ^1.0.7
+
+  # 🎨 أيقونات iOS
   cupertino_icons: ^1.0.2
-  firebase_core: ^2.25.4
-  firebase_auth: ^4.15.3
+
+  # 🔥 Firebase
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
+  generate: true
 
   assets:
+    - assets/laptop.png
+    - assets/books.png
+    - assets/stethoscope.png
+    - assets/labcoat.png
     - assets/shopping_bag.png

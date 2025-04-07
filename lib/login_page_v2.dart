@@ -1,20 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart';
 import 'login_screen.dart';
+import 'forgot_password_screen.dart';
+import 'home_page.dart';
 
-class LoginPageV2 extends StatelessWidget {
+class LoginPageV2 extends StatefulWidget {
   const LoginPageV2({super.key});
 
   @override
+  State<LoginPageV2> createState() => _LoginPageV2State();
+}
+
+class _LoginPageV2State extends State<LoginPageV2> {
+  bool rememberMe = false;
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool isUniversityEmail(String email) {
+    final regex = RegExp(r'^[a-zA-Z0-9_.]+@cit\.just\.edu\.jo$');
+    return regex.hasMatch(email);
+  }
+
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must enter your university email")),
+      );
+      return;
+    }
+
+    if (password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must enter your password")),
+      );
+      return;
+    }
+
+    if (!isUniversityEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid university email")),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    } on FirebaseAuthException catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Incorrect password or email, try again..."),
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
     final size = MediaQuery.of(context).size;
+    final textColor = isDark ? Colors.white : Colors.black;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () {
             Navigator.pushReplacement(
               context,
@@ -26,14 +92,14 @@ class LoginPageV2 extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 60),
-          const Text(
+          Text(
             'Welcome\nBack!',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Georgia',
               fontSize: 36,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF024cae),
+              color: isDark ? Colors.white : const Color(0xFF024cae),
               height: 1.2,
             ),
           ),
@@ -42,21 +108,20 @@ class LoginPageV2 extends StatelessWidget {
             child: Container(
               width: size.width,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 25),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF3891D6),
-                    Color(0xFF170557),
-                  ],
-                ),
+              decoration: BoxDecoration(
+                gradient: isDark
+                    ? null
+                    : const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF3891D6), Color(0xFF170557)],
+                      ),
               ),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(
+                    Center(
                       child: Text(
                         'Login',
                         style: TextStyle(
@@ -71,10 +136,7 @@ class LoginPageV2 extends StatelessWidget {
                     const Center(
                       child: Text(
                         'Sign in to continue.',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 18,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 18),
                       ),
                     ),
                     const SizedBox(height: 25),
@@ -87,9 +149,22 @@ class LoginPageV2 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    _customTextField(
-                      hintText: " ",
-                      icon: Icons.email_outlined,
+                    TextField(
+                      controller: _emailController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Your university email',
+                        hintStyle: const TextStyle(color: Colors.white70),
+                        prefixIcon: const Icon(Icons.email_outlined, color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.2),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     const Text(
@@ -101,37 +176,52 @@ class LoginPageV2 extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    _customTextField(
-                      hintText: "********",
-                      icon: Icons.lock_outline,
-                      obscure: true,
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: '**',
+                        hintStyle: const TextStyle(color: Colors.white70),
+                        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.2),
+                        contentPadding:
+                            const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
                           child: const Text(
                             'Forgot Password?',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
+                            style: TextStyle(color: Colors.white, fontSize: 15),
                           ),
                         ),
                         Row(
                           children: [
                             Checkbox(
-                              value: false,
-                              onChanged: (_) {},
+                              value: rememberMe,
+                              onChanged: (value) => setState(() => rememberMe = value!),
                               side: const BorderSide(color: Colors.white),
+                              checkColor: Colors.blue,
+                              activeColor: Colors.white,
                             ),
-                            const Text(
-                              'Remember me',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 15),
-                            ),
+                            const Text('Remember me', style: TextStyle(color: Colors.white)),
                           ],
                         ),
                       ],
@@ -139,22 +229,16 @@ class LoginPageV2 extends StatelessWidget {
                     const SizedBox(height: 25),
                     Center(
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _login,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.blue.shade800,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 60,
-                            vertical: 14,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],
@@ -163,30 +247,6 @@ class LoginPageV2 extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  static Widget _customTextField({
-    required String hintText,
-    required IconData icon,
-    bool obscure = false,
-  }) {
-    return TextField(
-      obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.2),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
       ),
     );
   }

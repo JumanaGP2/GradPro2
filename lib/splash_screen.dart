@@ -1,11 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'login_screen.dart'; // استيراد صفحة تسجيل الدخول
-// ignore: unused_import
-import 'login_page_v2.dart';
-
-
+import 'login_screen.dart'; 
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -19,25 +14,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
 
-    // الانتقال إلى صفحة تسجيل الدخول بعد 6 ثوانٍ
-    Timer(Duration(seconds: 6), () {
-      if (mounted) { // التحقق من أن الـ Widget لا يزال في الشجرة
-        //Navigator.of(context).pushReplacement(
-         // MaterialPageRoute(builder: (context) => LoginScreen()), // التنقل إلى LoginScreen
-        //);
+    
+    Timer(const Duration(seconds: 6), () {
+      if (mounted) {
         Navigator.of(context).pushReplacement(
-  MaterialPageRoute(builder: (context) => LoginScreen()),
-
-
-);
-
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
       }
     });
 
-    // تهيئة تأثير Fade Animation
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 2),
+      duration: const Duration(seconds: 2),
     )..forward();
 
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -56,23 +44,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-  gradient: LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFF3891D6), // الأزرق الفاتح من الأعلى
-      Color(0xFF170557), // الأزرق الغامق من الأسفل
-    ],
-  ),
-),
-
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF3891D6),
+              Color(0xFF170557),
+            ],
+          ),
+        ),
         child: Center(
           child: FadeTransition(
             opacity: _animation,
             child: Image.asset(
-              'assets/shopping_bag.png', // تأكد من أن الصورة موجودة في مجلد assets
+              'assets/shopping_bag.png', 
               width: 200,
               height: 200,
+              fit: BoxFit.contain,
             ),
           ),
         ),

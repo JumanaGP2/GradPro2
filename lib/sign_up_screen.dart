@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'home_page.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -15,9 +17,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
 
   bool agree = false;
-  bool usernameTaken = false;
-
-  final List<String> takenUsernames = ['admin', 'testuser', 'ghazal']; // للتجربة فقط
+  final List<String> takenUsernames = ['admin', 'testuser', 'ghazal'];
 
   @override
   void dispose() {
@@ -33,17 +33,68 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return regex.hasMatch(email);
   }
 
+  Future<void> _registerWithFirebase() async {
+    FocusScope.of(context).unfocus();
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      // ignore: unused_local_variable
+      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("✅ Account Created Successfully"),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      await Future.delayed(const Duration(seconds: 2));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = 'This email is already in use.';
+          break;
+        case 'invalid-email':
+          message = 'The email address is invalid.';
+          break;
+        case 'weak-password':
+          message = 'The password is too weak.';
+          break;
+        default:
+          message = 'Unexpected error: ${e.message}';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("❌ $message")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("❌ Something went wrong. Please try again.")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(isDark),
               const SizedBox(height: 20),
               Form(
                 key: _formKey,
@@ -51,11 +102,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   children: [
                     _buildTextField(
                       controller: _usernameController,
-                      hint: 'user name',
+                      hint: 'User Name',
                       icon: Icons.person,
                       validator: (value) {
-                        if (takenUsernames.contains(value?.trim())) {
-                          return '*This username already in use';
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your user name';
+                        }
+                        if (takenUsernames.contains(value.trim().toLowerCase())) {
+                          return 'This username is already in use';
                         }
                         return null;
                       },
@@ -63,11 +117,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 10),
                     _buildTextField(
                       controller: _emailController,
-                      hint: 'Email Address',
+                      hint: 'University Email',
                       icon: Icons.email,
                       validator: (value) {
-                        if (!isUniversityEmail(value!.trim())) {
-                          return '*Make sure to use the university email';
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your university email';
+                        }
+                        if (!isUniversityEmail(value.trim())) {
+                          return 'Use a valid university email (e.g. name@cit.just.edu.jo)';
                         }
                         return null;
                       },
@@ -78,16 +135,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       hint: 'Password',
                       icon: Icons.lock,
                       obscure: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Enter a password';
+                        }
+                        if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 10),
                     _buildTextField(
                       controller: _confirmPasswordController,
-                      hint: 'Retype Password',
+                      hint: 'Confirm Password',
                       icon: Icons.lock_outline,
                       obscure: true,
                       validator: (value) {
                         if (value != _passwordController.text) {
-                          return '*passwords doesn\'t Match';
+                          return 'Passwords do not match';
                         }
                         return null;
                       },
@@ -98,9 +164,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Checkbox(
                           value: agree,
                           onChanged: (val) {
-                            setState(() {
-                              agree = val!;
-                            });
+                            setState(() => agree = val ?? false);
                           },
                         ),
                         const Text("I agree to the "),
@@ -114,14 +178,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     _buildSignUpButton(),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
+                      onTap: () => Navigator.pop(context),
                       child: const Text(
-                        "Have an account? Login",
+                        "Already have an account? Login",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    )
+                    ),
                   ],
                 ),
               )
@@ -132,17 +194,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool isDark) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF3891D6), Color(0xFF170557)],
+          colors: isDark
+              ? [Colors.grey.shade800, Colors.black87]
+              : [const Color(0xFF3891D6), const Color(0xFF170557)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
@@ -165,23 +229,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     bool obscure = false,
     String? Function(String?)? validator,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: controller,
       obscureText: obscure,
       validator: validator,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black),
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon),
+        hintStyle: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+        prefixIcon: Icon(icon, color: isDark ? Colors.white70 : Colors.black87),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDark ? Colors.grey.shade800 : Colors.white,
         contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.black12),
+          borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Colors.blue),
+          borderSide: BorderSide(color: isDark ? Colors.blue.shade200 : Colors.blue),
         ),
         errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
       ),
@@ -192,15 +260,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: agree
-            ? () {
-                if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("✅ Account Created Successfully")),
-                  );
-                }
-              }
-            : null,
+        onPressed: agree ? _registerWithFirebase : null,
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
