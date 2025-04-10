@@ -10,6 +10,8 @@ import 'privacy_policy_page.dart';
 import 'about_app_page.dart';
 // ignore: unused_import
 import 'rate_app_page.dart'; // تأكدي أن الملف موجود ومساره صحيح
+import 'package:share_plus/share_plus.dart'; // أضف هذا السطر في الأعلى
+
 
 
 class SettingsPage extends StatefulWidget {
@@ -160,11 +162,17 @@ class _SettingsPageState extends State<SettingsPage> {
 ),
 
           ListTile(
-            leading: const Icon(Icons.share, color: Colors.pink),
-            title: const Text('Share This App'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
-          ),
+  leading: const Icon(Icons.share, color: Colors.pink),
+  title: const Text('Share This App'),
+  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+  onTap: () {
+    Share.share(
+       '\nhttps://JUSTSTORE.com/juststore',
+  subject: 'Just Store App 🌟',
+    );
+  },
+),
+
           ListTile(
             leading: const Icon(Icons.info_outline, color: Colors.teal),
             title: const Text('About'),

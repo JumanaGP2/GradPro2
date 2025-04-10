@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
+import 'contact_info_page.dart'; // تأكد أن هذه الصفحة موجودة
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -139,7 +140,18 @@ class _ProfilePageState extends State<ProfilePage> {
             style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
           ),
           const SizedBox(height: 30),
-          _buildItem(context, Icons.phone, "Contact Info", Colors.green, () {}),
+          _buildItem(
+            context,
+            Icons.phone,
+            "Contact Info",
+            Colors.green,
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ContactInfoPage()),
+              );
+            },
+          ),
           _buildItem(context, Icons.history, "Recent Activities", Colors.pinkAccent, () {}),
           _buildItem(context, Icons.security, "Security Settings", Colors.amber, () {}),
           _buildItem(context, Icons.logout, "Log out", Colors.red, () {
@@ -150,8 +162,13 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildItem(BuildContext context, IconData icon, String label,
-      Color color, VoidCallback onTap) {
+  Widget _buildItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    Color color,
+    VoidCallback onTap,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return ListTile(
       leading: CircleAvatar(

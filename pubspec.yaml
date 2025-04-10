@@ -10,10 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   # 📦 إدارة الحالة والتخزين المؤقت
   provider: ^6.1.1
   shared_preferences: ^2.2.2
+  share_plus: ^7.2.1
+
 
   # 📦 الوصول إلى المسارات
   path_provider: ^2.1.2
@@ -46,7 +47,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
-
   assets:
     - assets/laptop.png
     - assets/books.png
