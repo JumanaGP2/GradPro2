@@ -12,7 +12,14 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();  
   await Firebase.initializeApp();
-
+  try {
+  await Firebase.initializeApp();
+  // ignore: avoid_print
+  print('Firebase initialized successfully');
+} catch (e) {
+  // ignore: avoid_print
+  print('Error initializing Firebase: $e'); 
+}
   // تهيئة الإشعارات
   const AndroidInitializationSettings androidInit =
       AndroidInitializationSettings('@mipmap/ic_launcher');

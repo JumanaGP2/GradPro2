@@ -8,6 +8,9 @@ import 'profile_page.dart';
 import 'terms_conditions_page.dart';
 import 'privacy_policy_page.dart';
 import 'about_app_page.dart';
+// ignore: unused_import
+import 'rate_app_page.dart'; // تأكدي أن الملف موجود ومساره صحيح
+
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -82,7 +85,9 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Settings', style: TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            Navigator.pop(context); // يرجع مباشرة للصفحة السابقة
+          },
         ),
       ),
       body: ListView(
@@ -143,11 +148,17 @@ class _SettingsPageState extends State<SettingsPage> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.star, color: Colors.purple),
-            title: const Text('Rate This App'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
-          ),
+  leading: const Icon(Icons.star, color: Colors.purple),
+  title: const Text('Rate This App'),
+  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const RateAppPage()),
+    );
+  },
+),
+
           ListTile(
             leading: const Icon(Icons.share, color: Colors.pink),
             title: const Text('Share This App'),

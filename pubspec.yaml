@@ -36,6 +36,8 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_auth: ^5.5.2
 
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -51,3 +53,8 @@ flutter:
     - assets/stethoscope.png
     - assets/labcoat.png
     - assets/shopping_bag.png
+    - assets/bag_icon.png
+    - assets/emoji_amazing.png
+    - assets/emoji_bad.png
+    - assets/emoji_good.png
+    - assets/emoji_ok.png
