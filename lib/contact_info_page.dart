@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'profile_page.dart';
 
 class ContactInfoPage extends StatefulWidget {
   const ContactInfoPage({super.key});
@@ -48,76 +49,37 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : Colors.black;
+    final backgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    const mainColor = Color(0xFF3B3B98);
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF3B3B98),
+        backgroundColor: mainColor,
         centerTitle: true,
         title: const Text('Contact Information', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+        child: ListView(
           children: [
-            Text(
-              'Phone Number',
-              style: TextStyle(
-                fontSize: 16,
-                color: textColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const SizedBox(height: 10),
+            _buildSectionTitle("Phone Number", textColor),
             const SizedBox(height: 8),
-            TextField(
-              controller: phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                hintText: '+962-7xxx-xxxx',
-                filled: true,
-                fillColor: isDark ? Colors.grey[850] : Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              style: TextStyle(color: textColor),
-            ),
+            _buildTextField(phoneController, isDark, "+962-7xxx-xxxx"),
             const SizedBox(height: 20),
-            Text(
-              'WhatsApp Number',
-              style: TextStyle(
-                fontSize: 16,
-                color: textColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            _buildSectionTitle("WhatsApp Number", textColor),
             const SizedBox(height: 8),
-            TextField(
-              controller: whatsappController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                hintText: '+962-7xxx-xxxx',
-                filled: true,
-                fillColor: isDark ? Colors.grey[850] : Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              style: TextStyle(color: textColor),
-            ),
+            _buildTextField(whatsappController, isDark, "+962-7xxx-xxxx"),
             const SizedBox(height: 20),
             Row(
               children: [
                 Checkbox(
                   value: remember,
+                  activeColor: mainColor,
                   onChanged: (val) {
-                    setState(() {
-                      remember = val ?? false;
-                    });
+                    setState(() => remember = val ?? false);
                   },
                 ),
                 Text(
@@ -126,21 +88,72 @@ class _ContactInfoPageState extends State<ContactInfoPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             Center(
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 onPressed: _saveContactInfo,
+                icon: const Icon(Icons.save),
+                label: const Text('Save my information'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B3B98),
+                  backgroundColor: mainColor,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                ),
-                child: const Text(
-                  'Save my information',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  textStyle: const TextStyle(fontSize: 16),
                 ),
               ),
             ),
           ],
+        ),
+      ),
+
+      // ✅ Bottom Navigation Bar
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: mainColor,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        currentIndex: 2, // Profile tab
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pop(context);
+          } else if (index == 1) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("💬 Chat icon tapped")),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            );
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, Color color) {
+    return Text(
+      title,
+      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, bool isDark, String hint) {
+    return TextField(
+      controller: controller,
+      keyboardType: TextInputType.phone,
+      style: TextStyle(color: isDark ? Colors.white : Colors.black),
+      decoration: InputDecoration(
+        hintText: hint,
+        filled: true,
+        fillColor: isDark ? Colors.grey[850] : Colors.grey[200],
+        hintStyle: TextStyle(color: Colors.grey[500]),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
         ),
       ),
     );

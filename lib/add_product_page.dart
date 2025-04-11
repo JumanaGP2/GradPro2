@@ -1,4 +1,4 @@
-// AddProductPage with Dark Mode support
+// AddProductPage with Multiple Image Upload and Dark Mode support
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,7 +13,9 @@ class AddProductPage extends StatefulWidget {
 }
 
 class _AddProductPageState extends State<AddProductPage> {
-  File? _image;
+  final List<File> _images = [];
+  final ImagePicker _picker = ImagePicker();
+
   final TextEditingController _productInfoController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -28,11 +30,12 @@ class _AddProductPageState extends State<AddProductPage> {
   bool isCallSelected = false;
   bool isChatSelected = false;
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() => _image = File(picked.path));
+  Future<void> _pickImages() async {
+    final pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles.isNotEmpty) {
+      setState(() {
+        _images.addAll(pickedFiles.map((x) => File(x.path)).take(6 - _images.length));
+      });
     }
   }
 
@@ -47,66 +50,69 @@ class _AddProductPageState extends State<AddProductPage> {
         leading: const BackButton(color: Colors.white),
         elevation: 0,
         backgroundColor: const Color(0xFF3B3B98),
+        title: const Text("Add Product", style: TextStyle(color: Colors.white)),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Upload product image
-            GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.green.shade100,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: _image == null
-                    ? Center(
-                        child: Text(
-                          "Upload product Image",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
+            Text("Upload Product Images", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _images.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == _images.length && _images.length < 6) {
+                    return GestureDetector(
+                      onTap: _pickImages,
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Image.file(_image!, fit: BoxFit.cover),
+                        child: const Icon(Icons.add_a_photo, size: 30, color: Colors.grey),
                       ),
+                    );
+                  } else if (index < _images.length) {
+                    return Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      width: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: FileImage(_images[index]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox();
+                },
               ),
             ),
-            const SizedBox(height: 20),
 
-           
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _productInfoController,
-                    maxLines: 3,
-                    style: TextStyle(color: textColor),
-                    decoration: _inputDecoration("Add product info", isDark),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    controller: _priceController,
-                    keyboardType: TextInputType.number,
-                    style: TextStyle(color: textColor),
-                    decoration: _inputDecoration("Product Price", isDark),
-                  ),
-                ),
-              ],
+            const SizedBox(height: 20),
+            TextField(
+              controller: _productInfoController,
+              maxLines: 3,
+              style: TextStyle(color: textColor),
+              decoration: _inputDecoration("Add product info", isDark),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _priceController,
+              keyboardType: TextInputType.number,
+              style: TextStyle(color: textColor),
+              decoration: _inputDecoration("Product Price", isDark),
             ),
             const SizedBox(height: 30),
-
-            
-            Text("Select Categories \u25BC", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
+            Text("Select Categories ▼", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: selectedCategory,
@@ -118,22 +124,13 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               dropdownColor: isDark ? Colors.grey[900] : Colors.white,
               hint: Text("Choose a category", style: TextStyle(color: textColor)),
-              items: categories.map((cat) {
-                return DropdownMenuItem(
-                  value: cat,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.toggle_on, color: Colors.blue),
-                      const SizedBox(width: 10),
-                      Text(cat, style: TextStyle(color: textColor)),
-                    ],
-                  ),
-                );
-              }).toList(),
+              items: categories.map((cat) => DropdownMenuItem(
+                value: cat,
+                child: Text(cat, style: TextStyle(color: textColor)),
+              )).toList(),
               onChanged: (val) => setState(() => selectedCategory = val),
             ),
-            const SizedBox(height: 35),
-
+            const SizedBox(height: 30),
             Text("Select contact info", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
             const SizedBox(height: 12),
             Row(
@@ -154,7 +151,6 @@ class _AddProductPageState extends State<AddProductPage> {
               ],
             ),
             const SizedBox(height: 20),
-
             if (isCallSelected)
               TextField(
                 controller: _phoneController,
@@ -162,8 +158,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 style: TextStyle(color: textColor),
                 decoration: _inputDecoration("Enter your phone number", isDark),
               ),
-
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -171,7 +166,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 icon: const Icon(Icons.check_circle_outline),
                 label: const Text("Publish Product"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade800,
+                  backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

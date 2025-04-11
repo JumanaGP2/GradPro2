@@ -4,7 +4,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
-import 'contact_info_page.dart'; // تأكد أن هذه الصفحة موجودة
+
+import 'contact_info_page.dart';
+import 'security_settings_page.dart';
+import 'recent_activities_page.dart';
+import 'login_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,8 +19,9 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   File? _imageFile;
-  String _username = 'Username';
-  String _email = 'your@email.com';
+  String _username = 'Jonathan Patterson';
+  String _email = 'hello@reallygreatsite.com';
+  int _selectedIndex = 2;
 
   @override
   void initState() {
@@ -31,8 +36,8 @@ class _ProfilePageState extends State<ProfilePage> {
       _imageFile = File(imagePath);
     }
     setState(() {
-      _username = prefs.getString('username') ?? 'Username';
-      _email = prefs.getString('email') ?? 'your@email.com';
+      _username = prefs.getString('username') ?? _username;
+      _email = prefs.getString('email') ?? _email;
     });
   }
 
@@ -56,34 +61,38 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _editUsername() async {
-    final controller = TextEditingController(text: _username);
-    final result = await showDialog<String>(
+  void _confirmLogout() {
+    showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Username'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: "Enter new username"),
-        ),
+        title: const Text('Logout Confirmation'),
+        content: const Text('Do you want to logout?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('No'),
+          ),
           ElevatedButton(
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('Save')),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                (route) => false,
+              );
+            },
+            child: const Text('Yes'),
+          ),
         ],
       ),
     );
+  }
 
-    if (result != null && result.trim().isNotEmpty) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('username', result);
-      setState(() => _username = result);
-
+  void _onNavTapped(int index) {
+    if (index == 0) {
+      Navigator.pop(context); // يفترض أن الصفحة الرئيسية هي السابقة
+    } else if (index == 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ Username changed successfully')),
+        const SnackBar(content: Text("💬 Chat icon tapped")),
       );
     }
   }
@@ -96,96 +105,134 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1746A2),
+        title: const Text('Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        title: const Text(
-          'Profile',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 30),
-          GestureDetector(
-            onTap: _pickImage,
-            child: CircleAvatar(
-              radius: 45,
-              backgroundColor: Colors.blue.shade100,
-              backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
-              child: _imageFile == null
-                  ? const Icon(Icons.person, size: 45, color: Colors.blue)
-                  : null,
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey.shade300,
+                backgroundImage:
+                    _imageFile != null ? FileImage(_imageFile!) : null,
+                child: _imageFile == null
+                    ? const Icon(Icons.person, size: 50, color: Colors.blue)
+                    : null,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: _editUsername,
-            child: Text(
+            const SizedBox(height: 12),
+            Text(
               _username,
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.blue,
+                color: Color(0xFF1746A2),
               ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            _email,
-            style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-          ),
-          const SizedBox(height: 30),
-          _buildItem(
-            context,
-            Icons.phone,
-            "Contact Info",
-            Colors.green,
-            () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ContactInfoPage()),
-              );
-            },
-          ),
-          _buildItem(context, Icons.history, "Recent Activities", Colors.pinkAccent, () {}),
-          _buildItem(context, Icons.security, "Security Settings", Colors.amber, () {}),
-          _buildItem(context, Icons.logout, "Log out", Colors.red, () {
-            // TODO: logout logic
-          }),
+            const SizedBox(height: 4),
+            Text(
+              _email,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? Colors.white70 : Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 30),
+            _buildProfileOption(
+              icon: Icons.phone,
+              label: 'Contact Info',
+              color: Colors.green,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ContactInfoPage()),
+                );
+              },
+            ),
+            _buildProfileOption(
+              icon: Icons.history,
+              label: 'Recent Activities',
+              color: Colors.pink,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RecentActivitiesPage()),
+                );
+              },
+            ),
+            _buildProfileOption(
+              icon: Icons.security,
+              label: 'Security Settings',
+              color: Colors.amber,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) =>  SecuritySettingsPage()),
+                );
+              },
+            ),
+            _buildProfileOption(
+              icon: Icons.logout,
+              label: 'Log out',
+              color: Colors.red,
+              isLogout: true,
+              onTap: _confirmLogout,
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF3B3B98),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+            _onNavTapped(index);
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );
   }
 
-  Widget _buildItem(
-    BuildContext context,
-    IconData icon,
-    String label,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: color.withOpacity(0.1),
-        child: Icon(icon, color: color),
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 16,
-          color: label == 'Log out'
-              ? Colors.red
-              : (isDark ? Colors.white : Colors.black),
-          fontWeight: label == 'Log out' ? FontWeight.bold : FontWeight.normal,
+  Widget _buildProfileOption({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+    bool isLogout = false,
+  }) {
+    return Card(
+      elevation: 1,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: Icon(icon, color: color),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: isLogout ? FontWeight.bold : FontWeight.normal,
+            color: isLogout ? Colors.red : null,
+          ),
         ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
       ),
-      onTap: onTap,
     );
   }
 }

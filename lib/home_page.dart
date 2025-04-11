@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'add_product_page.dart';
 import 'settings_page.dart';
+import 'profile_page.dart';
 import 'theme_provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,24 +16,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  String _username = 'User';
+  int _unreadMessages = 3;
 
-  final List<Widget> _pages = [
-    const HomeContent(),
-    const Center(child: Text('Chat Page')),
-    const Center(child: Text('Notifications Page')),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUsername();
+  }
 
-  void _onItemTapped(int index) {
-    if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const SettingsPage()),
-      );
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+  Future<void> _loadUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _username = prefs.getString('username') ?? 'User';
+    });
+  }
+
+  Widget _buildBody() {
+    return _selectedIndex == 0
+        ? HomeContent(username: _username, unreadMessages: _unreadMessages)
+        : const ProfilePage();
   }
 
   @override
@@ -39,27 +44,110 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: isDark ? Colors.grey[900] : Colors.white,
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue.shade700,
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications_none), label: 'Alert'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+      body: Stack(
+        children: [
+          _buildBody(),
+
+          // Settings & Messages icons aligned with "Welcome"
+          Positioned(
+            top: 77,
+            right: 20,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsPage()),
+                    );
+                  },
+                ),
+                Stack(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('💬 Chat icon tapped')),
+                        );
+                      },
+                    ),
+                    if (_unreadMessages > 0)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.red,
+                          ),
+                          child: Text(
+                            '$_unreadMessages',
+                            style: const TextStyle(color: Colors.white, fontSize: 10),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF3B3B98),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddProductPage()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+  shape: const CircularNotchedRectangle(),
+  notchMargin: 8,
+  color: const Color(0xFF3B3B98),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 25),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.home, color: Colors.white),
+          onPressed: () => setState(() => _selectedIndex = 0),
+        ),
+        const SizedBox(width: 40),
+        IconButton(
+          icon: const Icon(Icons.person, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            );
+          },
+        ),
+      ],
+    ),
+  ),
+),
+
     );
   }
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+  final String username;
+  final int unreadMessages;
+
+  const HomeContent({
+    super.key,
+    required this.username,
+    required this.unreadMessages,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +159,6 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
@@ -86,33 +173,16 @@ class HomeContent extends StatelessWidget {
                   bottomRight: Radius.circular(25),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Welcome!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const AddProductPage()),
-                      );
-                    },
-                  ),
-                ],
+              child: Text(
+                'Welcome, $username!',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            
             Row(
               children: [
                 const Expanded(
@@ -138,9 +208,7 @@ class HomeContent extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
-
             GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
@@ -156,12 +224,9 @@ class HomeContent extends StatelessWidget {
                 CategoryItem(label: 'Dental Equipment', icon: Icons.medical_services),
               ],
             ),
-
             const SizedBox(height: 20),
-
             const Text('Recommended', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
-
             Column(
               children: [
                 Row(

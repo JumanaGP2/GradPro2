@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'theme_provider.dart';
 import 'splash_screen.dart';
-
+ 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
