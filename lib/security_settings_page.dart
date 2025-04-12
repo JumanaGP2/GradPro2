@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'profile_page.dart';
 
 class SecuritySettingsPage extends StatelessWidget {
   SecuritySettingsPage({super.key});
@@ -105,33 +104,6 @@ class SecuritySettingsPage extends StatelessWidget {
           ),
         ],
       ),
-
-      // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: mainColor,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        currentIndex: 2, // Profile tab
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pop(context);
-          } else if (index == 1) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("💬 Chat icon tapped")),
-            );
-          } else if (index == 2) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfilePage()),
-            );
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
-      ),
     );
   }
 
@@ -146,8 +118,11 @@ class SecuritySettingsPage extends StatelessWidget {
   }
 
   Widget _buildInputField(
-      TextEditingController controller, Color bgColor, Color textColor,
-      {bool isPassword = false}) {
+    TextEditingController controller,
+    Color bgColor,
+    Color textColor, {
+    bool isPassword = false,
+  }) {
     return TextField(
       controller: controller,
       obscureText: isPassword,

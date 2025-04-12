@@ -6,6 +6,10 @@ import 'add_product_page.dart';
 import 'settings_page.dart';
 import 'profile_page.dart';
 import 'theme_provider.dart';
+import 'chat_list_page.dart';
+import 'books_products_page.dart';
+import 'engineering_tools_page.dart';
+import 'electronics_page.dart'; // ✅ استيراد صفحة Electronics
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,8 +51,6 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           _buildBody(),
-
-          // Settings & Messages icons aligned with "Welcome"
           Positioned(
             top: 77,
             right: 20,
@@ -57,10 +59,7 @@ class _HomePageState extends State<HomePage> {
                 IconButton(
                   icon: const Icon(Icons.settings, color: Colors.white),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SettingsPage()),
-                    );
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
                   },
                 ),
                 Stack(
@@ -68,9 +67,7 @@ class _HomePageState extends State<HomePage> {
                     IconButton(
                       icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('💬 Chat icon tapped')),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatListPage()));
                       },
                     ),
                     if (_unreadMessages > 0)
@@ -99,45 +96,40 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF3B3B98),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddProductPage()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const AddProductPage()));
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-  shape: const CircularNotchedRectangle(),
-  notchMargin: 8,
-  color: const Color(0xFF3B3B98),
-  child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 25),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
-          onPressed: () => setState(() => _selectedIndex = 0),
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        color: const Color(0xFF3B3B98),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.home, color: Colors.white),
+                onPressed: () => setState(() => _selectedIndex = 0),
+              ),
+              const SizedBox(width: 40),
+              IconButton(
+                icon: const Icon(Icons.person, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage()));
+                },
+              ),
+            ],
+          ),
         ),
-        const SizedBox(width: 40),
-        IconButton(
-          icon: const Icon(Icons.person, color: Colors.white),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfilePage()),
-            );
-          },
-        ),
-      ],
-    ),
-  ),
-),
-
+      ),
     );
   }
 }
+
+// ===========================
 
 class HomeContent extends StatelessWidget {
   final String username;
@@ -215,13 +207,31 @@ class HomeContent extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
-              children: const [
-                CategoryItem(label: 'Books & Slide', icon: Icons.menu_book),
-                CategoryItem(label: 'Electronics', icon: Icons.computer),
-                CategoryItem(label: 'Engineering Tools', icon: Icons.architecture),
-                CategoryItem(label: 'Arts & Crafts', icon: Icons.brush),
-                CategoryItem(label: 'Clothes', icon: Icons.checkroom),
-                CategoryItem(label: 'Dental Equipment', icon: Icons.medical_services),
+              children: [
+                CategoryItem(
+                  label: 'Books & Slide',
+                  icon: Icons.menu_book,
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const BooksProductsPage()));
+                  },
+                ),
+                CategoryItem(
+                  label: 'Engineering Tools',
+                  icon: Icons.architecture,
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EngineeringToolsPage()));
+                  },
+                ),
+                CategoryItem(
+                  label: 'Electronics',
+                  icon: Icons.computer,
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectronicsPage()));
+                  },
+                ),
+                const CategoryItem(label: 'Arts & Crafts', icon: Icons.brush),
+                const CategoryItem(label: 'Clothes', icon: Icons.checkroom),
+                const CategoryItem(label: 'Dental Equipment', icon: Icons.medical_services),
               ],
             ),
             const SizedBox(height: 20),
@@ -256,27 +266,32 @@ class HomeContent extends StatelessWidget {
 class CategoryItem extends StatelessWidget {
   final String label;
   final IconData icon;
+  final VoidCallback? onTap;
 
-  const CategoryItem({super.key, required this.label, required this.icon});
+  const CategoryItem({
+    super.key,
+    required this.label,
+    required this.icon,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
 
-    return Column(
-      children: [
-        CircleAvatar(
-          backgroundColor: isDark ? Colors.blueGrey : Colors.blue.shade100,
-          radius: 30,
-          child: Icon(icon, size: 30, color: Colors.blue),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 12),
-        ),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          CircleAvatar(
+            backgroundColor: isDark ? Colors.blueGrey : Colors.blue.shade100,
+            radius: 30,
+            child: Icon(icon, size: 30, color: Colors.blue),
+          ),
+          const SizedBox(height: 6),
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
     );
   }
 }

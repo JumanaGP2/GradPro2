@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'profile_page.dart';
 
 class RecentActivitiesPage extends StatefulWidget {
   const RecentActivitiesPage({super.key});
@@ -99,25 +98,6 @@ class _RecentActivitiesPageState extends State<RecentActivitiesPage> {
                 )),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: titleColor,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        currentIndex: 2,
-        onTap: (index) {
-          if (index == 2) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfilePage()),
-            );
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
       ),
     );
   }

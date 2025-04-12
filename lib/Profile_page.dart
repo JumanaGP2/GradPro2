@@ -9,6 +9,7 @@ import 'contact_info_page.dart';
 import 'security_settings_page.dart';
 import 'recent_activities_page.dart';
 import 'login_screen.dart';
+import 'chat_list_page.dart'; // قائمة المحادثات
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _username = 'Jonathan Patterson';
   String _email = 'hello@reallygreatsite.com';
   int _selectedIndex = 2;
+  int _unreadMessages = 5; // 👈 عدد الرسائل غير المقروءة (افتراضي)
 
   @override
   void initState() {
@@ -76,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) =>  LoginScreen()),
+                MaterialPageRoute(builder: (_) => LoginScreen()),
                 (route) => false,
               );
             },
@@ -89,10 +91,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _onNavTapped(int index) {
     if (index == 0) {
-      Navigator.pop(context); // يفترض أن الصفحة الرئيسية هي السابقة
+      Navigator.pop(context);
     } else if (index == 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("💬 Chat icon tapped")),
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ChatListPage()),
       );
     }
   }
@@ -122,8 +125,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.grey.shade300,
-                backgroundImage:
-                    _imageFile != null ? FileImage(_imageFile!) : null,
+                backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
                 child: _imageFile == null
                     ? const Icon(Icons.person, size: 50, color: Colors.blue)
                     : null,
@@ -176,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) =>  SecuritySettingsPage()),
+                  MaterialPageRoute(builder: (_) => SecuritySettingsPage()),
                 );
               },
             ),
@@ -201,10 +203,33 @@ class _ProfilePageState extends State<ProfilePage> {
             _onNavTapped(index);
           });
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(
+            label: '',
+            icon: Stack(
+              children: [
+                const Icon(Icons.chat),
+                if (_unreadMessages > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '$_unreadMessages',
+                        style: const TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                    ),
+                  )
+              ],
+            ),
+          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );

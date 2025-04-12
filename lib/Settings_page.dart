@@ -20,7 +20,10 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool notificationsOn = false;
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  int _unreadMessages = 5; // 👈 عدد الرسائل الواردة
+
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
@@ -58,9 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
       importance: Importance.high,
       priority: Priority.high,
     );
-
     const notificationDetails = NotificationDetails(android: androidDetails);
-
     await _notificationsPlugin.show(
       0,
       '🔔 Notifications Enabled',
@@ -117,14 +118,8 @@ class _SettingsPageState extends State<SettingsPage> {
               setState(() {
                 notificationsOn = val;
               });
-
               _saveNotifications(val);
-
-              if (val) {
-                _showTestNotification();
-              } else {
-                _cancelAllNotifications();
-              }
+              val ? _showTestNotification() : _cancelAllNotifications();
             },
           ),
           const Divider(),
@@ -149,7 +144,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
 
-      // ✅ Bottom Navigation Bar
+      // ✅ Bottom Navigation Bar مع badge للرسائل
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF3B3B98),
         selectedItemColor: Colors.white,
@@ -169,10 +164,37 @@ class _SettingsPageState extends State<SettingsPage> {
             );
           }
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(
+            label: '',
+            icon: Stack(
+              children: [
+                const Icon(Icons.chat),
+                if (_unreadMessages > 0)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '$_unreadMessages',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );
