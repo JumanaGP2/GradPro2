@@ -1,55 +1,42 @@
 import 'package:flutter/material.dart';
-import 'book_details_page.dart';
+import 'dental_equipment_details_page.dart';
 
-class BooksProductsPage extends StatefulWidget {
-  const BooksProductsPage({super.key});
+class DentalEquipmentPage extends StatefulWidget {
+  const DentalEquipmentPage({super.key});
 
   @override
-  State<BooksProductsPage> createState() => _BooksProductsPageState();
+  State<DentalEquipmentPage> createState() => _DentalEquipmentPageState();
 }
 
-class _BooksProductsPageState extends State<BooksProductsPage> {
+class _DentalEquipmentPageState extends State<DentalEquipmentPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> allBooks = [];
-  List<Map<String, String>> filteredBooks = [];
+  List<Map<String, String>> allItems = [];
+  List<Map<String, String>> filteredItems = [];
 
   @override
   void initState() {
     super.initState();
-    _initBooks();
+    _loadItems();
   }
 
-  void _initBooks() {
-    allBooks = [
+  void _loadItems() {
+    allItems = [
       {
-        'image': 'assets/books.png',
-        'title': 'Medical Notes',
-        'description': 'Summary of all medicine topics.',
-        'price': '10',
-        'phone': '+962789999111',
-      },
-      {
-        'image': 'assets/books.png',
-        'title': 'Programming Basics',
-        'description': 'Learn Dart & Flutter basics.',
+        'image': 'assets/dental_equipment.png',
+        'title': 'Dental Kit Pro',
+        'description': 'Professional dental kit for hygiene.',
         'price': '15',
-        'phone': '+962798888222',
+        'phone': '+962788888888',
       },
-      {
-        'image': 'assets/books.png',
-        'title': 'Data Mining Slides',
-        'description': 'Comprehensive data mining info.',
-        'price': '12',
-        'phone': '+962797777333',
-      },
+      // يمكنك إضافة المزيد هنا بنفس الشكل
     ];
-    filteredBooks = List.from(allBooks);
+    filteredItems = List.from(allItems);
   }
 
-  void _filterBooks(String query) {
+  void _filter(String query) {
     setState(() {
-      filteredBooks = allBooks.where((book) {
-        return book['title']!.toLowerCase().contains(query.toLowerCase());
+      filteredItems = allItems.where((item) {
+        return item['title']!.toLowerCase().contains(query.toLowerCase());
       }).toList();
     });
   }
@@ -61,23 +48,21 @@ class _BooksProductsPageState extends State<BooksProductsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3B3B98),
-        title: const Text(
-          'Books & Slides',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Dental Equipment', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white), // ← لون زر الرجوع
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // 🔍 شريط البحث
             TextField(
               controller: _searchController,
-              onChanged: _filterBooks,
+              onChanged: _filter,
               decoration: InputDecoration(
-                hintText: 'Search books...',
+                hintText: 'Search dental tools...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: isDark ? Colors.grey[850] : Colors.grey[200],
@@ -88,35 +73,33 @@ class _BooksProductsPageState extends State<BooksProductsPage> {
               ),
             ),
             const SizedBox(height: 16),
+            // 🦷 عرض المنتجات
             Expanded(
-              child: filteredBooks.isEmpty
-                  ? const Center(child: Text('No books found.'))
+              child: filteredItems.isEmpty
+                  ? const Center(child: Text('No dental equipment found.'))
                   : ListView.builder(
-                      itemCount: filteredBooks.length,
+                      itemCount: filteredItems.length,
                       itemBuilder: (context, index) {
-                        final book = filteredBooks[index];
+                        final item = filteredItems[index];
                         return Card(
                           margin: const EdgeInsets.symmetric(vertical: 10),
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           child: ListTile(
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: Image.asset(
-                                book['image']!,
+                                item['image']!,
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
                               ),
                             ),
                             title: Text(
-                              book['title']!,
+                              item['title']!,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
-                              book['description']!,
+                              item['description']!,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -125,21 +108,20 @@ class _BooksProductsPageState extends State<BooksProductsPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => BookDetailsPage(
-                                      image: book['image']!,
-                                      title: book['title']!,
-                                      description: book['description']!,
-                                      price: book['price']!,
-                                      phoneNumber: book['phone']!,
+                                    builder: (_) => DentalEquipmentDetailsPage(
+                                      image: item['image']!,
+                                      title: item['title']!,
+                                      description: item['description']!,
+                                      price: item['price']!,
+                                      phoneNumber: item['phone']!,
                                     ),
                                   ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF3B3B98),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               ),
-                              child: const Text('View'),
+                              child: const Text("View"),
                             ),
                           ),
                         );

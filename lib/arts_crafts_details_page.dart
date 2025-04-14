@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'chat_page.dart';
 
-class ElectronicsDetailsPage extends StatelessWidget {
+class ArtsCraftsDetailsPage extends StatelessWidget {
   final String image;
   final String title;
   final String description;
   final String price;
   final String phoneNumber;
 
-  const ElectronicsDetailsPage({
+  const ArtsCraftsDetailsPage({
     super.key,
     required this.image,
     required this.title,
@@ -24,24 +24,22 @@ class ElectronicsDetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3B3B98),
-        title: Text(
-          title,
-          style: const TextStyle(color: Colors.white),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white), // ✅ لون زر الرجوع
+        title: Text(title),
+        foregroundColor: Colors.white,
         centerTitle: true,
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(12),
               child: Image.asset(
                 image,
-                height: 200,
                 width: double.infinity,
+                height: 200,
                 fit: BoxFit.cover,
               ),
             ),
@@ -50,18 +48,18 @@ class ElectronicsDetailsPage extends StatelessWidget {
               title,
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Text(
               description,
               style: TextStyle(
                 fontSize: 16,
-                color: isDark ? Colors.white70 : Colors.grey[800],
+                color: isDark ? Colors.grey[300] : Colors.grey[800],
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             Text(
-              '$price JD',
+              price,
               style: const TextStyle(
                 fontSize: 20,
                 color: Colors.green,
@@ -70,10 +68,10 @@ class ElectronicsDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             const Text(
-              "Contact Seller",
+              'Contact Seller',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -82,8 +80,8 @@ class ElectronicsDetailsPage extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
-                        title: const Text('Seller Contact'),
-                        content: Text('📞 $phoneNumber'),
+                        title: const Text('Call Seller'),
+                        content: Text('Phone: $phoneNumber'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
@@ -104,9 +102,7 @@ class ElectronicsDetailsPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => const ChatPage(userName: 'Admin'),
-                      ),
+                      MaterialPageRoute(builder: (_) => const ChatPage(userName: 'Admin')),
                     );
                   },
                   icon: const Icon(Icons.chat),
@@ -117,7 +113,7 @@ class ElectronicsDetailsPage extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

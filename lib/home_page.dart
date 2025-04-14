@@ -9,7 +9,10 @@ import 'theme_provider.dart';
 import 'chat_list_page.dart';
 import 'books_products_page.dart';
 import 'engineering_tools_page.dart';
-import 'electronics_page.dart'; // ✅ استيراد صفحة Electronics
+import 'electronics_page.dart';
+import 'arts_crafts_page.dart';
+import 'clothes_page.dart';
+import 'dental_equipment_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -208,30 +211,24 @@ class HomeContent extends StatelessWidget {
               crossAxisSpacing: 15,
               mainAxisSpacing: 15,
               children: [
-                CategoryItem(
-                  label: 'Books & Slide',
-                  icon: Icons.menu_book,
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const BooksProductsPage()));
-                  },
-                ),
-                CategoryItem(
-                  label: 'Engineering Tools',
-                  icon: Icons.architecture,
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EngineeringToolsPage()));
-                  },
-                ),
-                CategoryItem(
-                  label: 'Electronics',
-                  icon: Icons.computer,
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectronicsPage()));
-                  },
-                ),
-                const CategoryItem(label: 'Arts & Crafts', icon: Icons.brush),
-                const CategoryItem(label: 'Clothes', icon: Icons.checkroom),
-                const CategoryItem(label: 'Dental Equipment', icon: Icons.medical_services),
+                CategoryItem(label: 'Books & Slide', icon: Icons.menu_book, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BooksProductsPage()));
+                }),
+                CategoryItem(label: 'Engineering Tools', icon: Icons.architecture, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const EngineeringToolsPage()));
+                }),
+                CategoryItem(label: 'Electronics', icon: Icons.computer, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectronicsPage()));
+                }),
+                CategoryItem(label: 'Arts & Crafts', icon: Icons.brush, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ArtsCraftsPage()));
+                }),
+                CategoryItem(label: 'Clothes', icon: Icons.checkroom, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ClothesPage()));
+                }),
+                CategoryItem(label: 'Dental Equipment', icon: Icons.medical_services, onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const DentalEquipmentPage()));
+                }),
               ],
             ),
             const SizedBox(height: 20),

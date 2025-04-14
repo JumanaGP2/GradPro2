@@ -54,7 +54,8 @@ class _ElectronicsPageState extends State<ElectronicsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3B3B98),
-        title: const Text('Electronics'),
+        title: const Text('Electronics', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white), // زر الرجوع أبيض
         centerTitle: true,
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
