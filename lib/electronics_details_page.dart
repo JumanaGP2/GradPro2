@@ -28,7 +28,7 @@ class ElectronicsDetailsPage extends StatelessWidget {
           title,
           style: const TextStyle(color: Colors.white),
         ),
-        iconTheme: const IconThemeData(color: Colors.white), // ✅ لون زر الرجوع
+        iconTheme: const IconThemeData(color: Colors.white),     
         centerTitle: true,
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

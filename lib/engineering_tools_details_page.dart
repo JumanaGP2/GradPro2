@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'chat_page.dart';
 
@@ -22,10 +23,13 @@ class EngineeringToolsDetailsPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(title),
         backgroundColor: const Color(0xFF3B3B98),
         foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -34,8 +38,8 @@ class EngineeringToolsDetailsPage extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                image,
+              child: Image.file(
+                File(image),
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -57,7 +61,7 @@ class EngineeringToolsDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              price,
+              '$price JD',
               style: const TextStyle(
                 fontSize: 20,
                 color: Colors.green,
@@ -100,7 +104,9 @@ class EngineeringToolsDetailsPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ChatPage(userName: 'Seller')),
+                      MaterialPageRoute(
+                        builder: (_) => const ChatPage(userName: 'Seller'),
+                      ),
                     );
                   },
                   icon: const Icon(Icons.chat),

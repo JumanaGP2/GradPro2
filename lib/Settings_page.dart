@@ -20,7 +20,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool notificationsOn = false;
-  int _unreadMessages = 5; // 👈 عدد الرسائل الواردة
+  int _unreadMessages = 5; 
 
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -144,7 +144,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
 
-      // ✅ Bottom Navigation Bar مع badge للرسائل
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF3B3B98),
         selectedItemColor: Colors.white,

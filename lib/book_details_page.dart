@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'chat_page.dart';
 
@@ -35,8 +36,8 @@ class BookDetailsPage extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
-              child: Image.asset(
-                image,
+              child: Image.file(
+                File(image), // ✅ عرض الصورة من ملف
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -102,7 +103,7 @@ class BookDetailsPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const ChatPage(userName: 'celler'),
+                        builder: (_) => const ChatPage(userName: 'seller'),
                       ),
                     );
                   },

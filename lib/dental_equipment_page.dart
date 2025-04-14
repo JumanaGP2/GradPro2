@@ -28,7 +28,6 @@ class _DentalEquipmentPageState extends State<DentalEquipmentPage> {
         'price': '15',
         'phone': '+962788888888',
       },
-      // يمكنك إضافة المزيد هنا بنفس الشكل
     ];
     filteredItems = List.from(allItems);
   }
@@ -57,7 +56,6 @@ class _DentalEquipmentPageState extends State<DentalEquipmentPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 🔍 شريط البحث
             TextField(
               controller: _searchController,
               onChanged: _filter,
@@ -73,7 +71,6 @@ class _DentalEquipmentPageState extends State<DentalEquipmentPage> {
               ),
             ),
             const SizedBox(height: 16),
-            // 🦷 عرض المنتجات
             Expanded(
               child: filteredItems.isEmpty
                   ? const Center(child: Text('No dental equipment found.'))

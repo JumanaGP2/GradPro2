@@ -101,7 +101,6 @@ class _RateAppPageState extends State<RateAppPage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // صورة الحقيبة + Hello Friends
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -123,7 +122,6 @@ class _RateAppPageState extends State<RateAppPage> {
 
             const SizedBox(height: 30),
 
-            // النص
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: RichText(
@@ -144,7 +142,6 @@ class _RateAppPageState extends State<RateAppPage> {
 
             const SizedBox(height: 20),
 
-            // الإيموجي + أسمائهم
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Row(
@@ -160,7 +157,6 @@ class _RateAppPageState extends State<RateAppPage> {
 
             const SizedBox(height: 25),
 
-            // النص والبوكس
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Align(
@@ -197,7 +193,6 @@ class _RateAppPageState extends State<RateAppPage> {
 
             const SizedBox(height: 20),
 
-            // الأزرار
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(

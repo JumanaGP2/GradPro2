@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'add_product_page.dart';
 import 'settings_page.dart';
 import 'profile_page.dart';
@@ -132,9 +131,9 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-// ===========================
 
-class HomeContent extends StatelessWidget {
+
+class HomeContent extends StatefulWidget {
   final String username;
   final int unreadMessages;
 
@@ -143,6 +142,38 @@ class HomeContent extends StatelessWidget {
     required this.username,
     required this.unreadMessages,
   });
+
+  @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  final TextEditingController _searchController = TextEditingController();
+
+  final List<Map<String, dynamic>> _categories = [
+    {'label': 'Books & Slide', 'icon': Icons.menu_book, 'page': const BooksProductsPage()},
+    {'label': 'Engineering Tools', 'icon': Icons.architecture, 'page': const EngineeringToolsPage()},
+    {'label': 'Electronics', 'icon': Icons.computer, 'page': const ElectronicsPage()},
+    {'label': 'Arts & Crafts', 'icon': Icons.brush, 'page': const ArtsCraftsPage()},
+    {'label': 'Clothes', 'icon': Icons.checkroom, 'page': const ClothesPage()},
+    {'label': 'Dental Equipment', 'icon': Icons.medical_services, 'page': const DentalEquipmentPage()},
+  ];
+
+  List<Map<String, dynamic>> _filteredCategories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredCategories = List.from(_categories);
+  }
+
+  void _filterCategories(String query) {
+    setState(() {
+      _filteredCategories = _categories
+          .where((item) => item['label'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +200,7 @@ class HomeContent extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Welcome, $username!',
+                'Welcome, ${widget.username}!',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -178,116 +209,40 @@ class HomeContent extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Category',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+            const Text('Category', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _searchController,
+              onChanged: _filterCategories,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: 'Search categories...',
+                filled: true,
+                fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide.none,
                 ),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: 'Search here...',
-                      filled: true,
-                      fillColor: isDark ? Colors.grey[800] : Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-            const SizedBox(height: 20),
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 15,
-              mainAxisSpacing: 15,
-              children: [
-                CategoryItem(label: 'Books & Slide', icon: Icons.menu_book, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BooksProductsPage()));
-                }),
-                CategoryItem(label: 'Engineering Tools', icon: Icons.architecture, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const EngineeringToolsPage()));
-                }),
-                CategoryItem(label: 'Electronics', icon: Icons.computer, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ElectronicsPage()));
-                }),
-                CategoryItem(label: 'Arts & Crafts', icon: Icons.brush, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ArtsCraftsPage()));
-                }),
-                CategoryItem(label: 'Clothes', icon: Icons.checkroom, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const ClothesPage()));
-                }),
-                CategoryItem(label: 'Dental Equipment', icon: Icons.medical_services, onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const DentalEquipmentPage()));
-                }),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text('Recommended', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Image.asset('assets/laptop.png', height: 80),
-                    Image.asset('assets/books.png', height: 80),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Image.asset('assets/stethoscope.png', height: 80),
-                    Image.asset('assets/labcoat.png', height: 80),
-                  ],
-                ),
-              ],
+              children: _filteredCategories.map((item) {
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  leading: CircleAvatar(
+                    backgroundColor: isDark ? Colors.blueGrey : Colors.blue.shade100,
+                    child: Icon(item['icon'], color: Colors.blue),
+                  ),
+                  title: Text(item['label'], style: const TextStyle(fontWeight: FontWeight.w600)),
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => item['page']));
+                  },
+                );
+              }).toList(),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CategoryItem extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  const CategoryItem({
-    super.key,
-    required this.label,
-    required this.icon,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          CircleAvatar(
-            backgroundColor: isDark ? Colors.blueGrey : Colors.blue.shade100,
-            radius: 30,
-            child: Icon(icon, size: 30, color: Colors.blue),
-          ),
-          const SizedBox(height: 6),
-          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
-        ],
       ),
     );
   }

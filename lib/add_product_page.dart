@@ -1,9 +1,11 @@
-// AddProductPage with Multiple Image Upload and Dark Mode support
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/product_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
 import 'theme_provider.dart';
+import 'providers/product_provider.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -25,6 +27,9 @@ class _AddProductPageState extends State<AddProductPage> {
     'Books & Slides',
     'Electronics',
     'Engineering Tools',
+    'Arts & Crafts',
+    'Clothes',
+    'Dental Equipment',
   ];
 
   bool isCallSelected = false;
@@ -39,6 +44,36 @@ class _AddProductPageState extends State<AddProductPage> {
     }
   }
 
+  void _publishProduct() {
+    if (_images.isEmpty ||
+        _productInfoController.text.isEmpty ||
+        _priceController.text.isEmpty ||
+        selectedCategory == null ||
+        (!isCallSelected && !isChatSelected)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields")),
+      );
+      return;
+    }
+
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+    provider.addProduct(
+      Product(
+        images: _images,
+        description: _productInfoController.text,
+        price: _priceController.text,
+        phone: _phoneController.text,
+        category: selectedCategory!,
+      ),
+    );
+
+    Navigator.pop(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("✅ Product published successfully")),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
@@ -47,11 +82,10 @@ class _AddProductPageState extends State<AddProductPage> {
     return Scaffold(
       backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        leading: const BackButton(color: Colors.white),
-        elevation: 0,
         backgroundColor: const Color(0xFF3B3B98),
         title: const Text("Add Product", style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        leading: const BackButton(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -96,7 +130,6 @@ class _AddProductPageState extends State<AddProductPage> {
                 },
               ),
             ),
-
             const SizedBox(height: 20),
             TextField(
               controller: _productInfoController,
@@ -111,30 +144,26 @@ class _AddProductPageState extends State<AddProductPage> {
               style: TextStyle(color: textColor),
               decoration: _inputDecoration("Product Price", isDark),
             ),
-            const SizedBox(height: 30),
-            Text("Select Categories ▼", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               value: selectedCategory,
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                labelText: "Choose Category",
+                labelStyle: TextStyle(color: textColor),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 filled: true,
                 fillColor: isDark ? Colors.grey[800] : Colors.grey.shade100,
               ),
-              dropdownColor: isDark ? Colors.grey[900] : Colors.white,
-              hint: Text("Choose a category", style: TextStyle(color: textColor)),
-              items: categories.map((cat) => DropdownMenuItem(
-                value: cat,
-                child: Text(cat, style: TextStyle(color: textColor)),
-              )).toList(),
+              items: categories.map((cat) {
+                return DropdownMenuItem(
+                  value: cat,
+                  child: Text(cat),
+                );
+              }).toList(),
               onChanged: (val) => setState(() => selectedCategory = val),
             ),
-            const SizedBox(height: 30),
-            Text("Select contact info", style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _contactOption(
                   icon: Icons.phone,
@@ -142,6 +171,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   isSelected: isCallSelected,
                   onTap: () => setState(() => isCallSelected = !isCallSelected),
                 ),
+                const SizedBox(width: 20),
                 _contactOption(
                   icon: Icons.chat,
                   label: "Chat",
@@ -150,7 +180,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
             if (isCallSelected)
               TextField(
                 controller: _phoneController,
@@ -162,7 +192,7 @@ class _AddProductPageState extends State<AddProductPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => print("Publishing product..."),
+                onPressed: _publishProduct,
                 icon: const Icon(Icons.check_circle_outline),
                 label: const Text("Publish Product"),
                 style: ElevatedButton.styleFrom(
@@ -185,9 +215,7 @@ class _AddProductPageState extends State<AddProductPage> {
       hintStyle: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
       filled: true,
       fillColor: isDark ? Colors.grey[800] : Colors.grey.shade100,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 

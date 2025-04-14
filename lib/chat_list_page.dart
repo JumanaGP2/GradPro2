@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'chat_page.dart'; // تأكد أن هذه الصفحة موجودة
+import 'chat_page.dart'; 
 
 class ChatListPage extends StatefulWidget {
   const ChatListPage({super.key});

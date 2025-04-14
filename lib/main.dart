@@ -2,25 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-
 import 'theme_provider.dart';
 import 'splash_screen.dart';
- 
+import 'providers/product_provider.dart'; 
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();  
-  await Firebase.initializeApp();
+
+  // تهيئة ال  Firebase
   try {
-  await Firebase.initializeApp();
-  // ignore: avoid_print
-  print('Firebase initialized successfully');
-} catch (e) {
-  // ignore: avoid_print
-  print('Error initializing Firebase: $e'); 
-}
-  // تهيئة الإشعارات
+    await Firebase.initializeApp();
+    print('****Firebase initialized successfully');
+  } catch (e) {
+    print('**** Error initializing Firebase: $e');
+  }
+
+  // تهيئه لل الإشعارات
   const AndroidInitializationSettings androidInit =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -30,8 +30,11 @@ Future<void> main() async {
   await flutterLocalNotificationsPlugin.initialize(initSettings);
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()), 
+      ],
       child: const MyApp(),
     ),
   );
@@ -47,7 +50,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: themeProvider.isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: SplashScreen(), // أو أي صفحة رئيسية أخرى
+      home:  SplashScreen(), 
     );
   }
 }

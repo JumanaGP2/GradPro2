@@ -18,7 +18,6 @@ class SecuritySettingsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Column(
         children: [
-          // Header
           Stack(
             children: [
               Container(
@@ -60,7 +59,6 @@ class SecuritySettingsPage extends StatelessWidget {
 
           const SizedBox(height: 30),
 
-          // Form Fields
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Column(

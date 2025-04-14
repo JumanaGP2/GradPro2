@@ -9,7 +9,7 @@ import 'contact_info_page.dart';
 import 'security_settings_page.dart';
 import 'recent_activities_page.dart';
 import 'login_screen.dart';
-import 'chat_list_page.dart'; // قائمة المحادثات
+import 'chat_list_page.dart'; 
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -23,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _username = 'Jonathan Patterson';
   String _email = 'hello@reallygreatsite.com';
   int _selectedIndex = 2;
-  int _unreadMessages = 5; // 👈 عدد الرسائل غير المقروءة (افتراضي)
+  int _unreadMessages = 5; 
 
   @override
   void initState() {

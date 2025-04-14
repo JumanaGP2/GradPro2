@@ -8,7 +8,7 @@ class PrivacyPolicyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF121212) : const Color(0xFFF3F8FC);
-    final headingColor = Colors.grey[800]; // عنوان الأقسام
+    final headingColor = Colors.grey[800]; 
     final textColor = isDark ? Colors.white70 : Colors.black87;
 
     return Scaffold(
